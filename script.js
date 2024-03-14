@@ -10,6 +10,7 @@ if (window.matchMedia("(max-width: 500px)").matches) {
     var height = 480;
 }
 
+
 var color_choices = [
     "#C7FC00",
     "#FF00FF",
@@ -67,11 +68,14 @@ for (var item in available_models) {
 var current_model_name = "microsoft-coco";
 const API_KEY = "rf_U7AD2Mxh39N7jQ3B6cP8xAyufLH3";
 const DETECT_API_KEY = "4l5zOVomQmkAqlTJPVKN";
-const CAMERA_ACCESS_URL = "https://uploads-ssl.webflow.com/5f6bc60e665f54545a1e52a5/63d40cd1de273045d359cf9a_camera-access2.png";
-const LOADING_URL = "https://uploads-ssl.webflow.com/5f6bc60e665f54545a1e52a5/63d40cd2210b56e0e33593c7_loading-camera2.gif";
+const CAMERA_ACCESS_URL = "https://i.pinimg.com/originals/0b/29/52/0b2952ca84f0ede66e8da3d23bd73df0.gif";
+const LOADING_URL = "https://i.pinimg.com/originals/0b/29/52/0b2952ca84f0ede66e8da3d23bd73df0.gif";
 var current_model_version = 9;
 var webcamLoop = false;
 
+window.onload = function() {
+    stopWebcam();
+};
 // when user scrolls past #model-select, stop webcam
 window.addEventListener("scroll", function() {
     if (window.scrollY > 100) {
@@ -134,6 +138,8 @@ var model = null;
 
 document.getElementById("video").setAttribute("playsinline", "");
 document.getElementById("video").play();
+document.getElementById("webcam-stop").addEventListener("click", stopWebcam);
+
 
 document.getElementById("video").addEventListener(
     "ended",
@@ -147,7 +153,7 @@ document.getElementById("video").addEventListener(
 document
     .getElementById("webcam-predict")
     .addEventListener("click", function () {
-    document.getElementById("picture_canvas").style.display = "block";
+    document.getElementById("picture_canvas").style.display = "none";
     document.getElementById("example_demo").style.display = "none";
     webcamInference();
     });
@@ -166,7 +172,7 @@ function switchModel() {
         document.getElementById("video").style.display = "block";
         document.getElementById("video").play();
         // hide command tray
-        document.getElementById("prechosen_images_parent").style.display = "none";
+        //document.getElementById("prechosen_images_parent").style.display = "none";
     }
     else if (current_model_name == "variety-of-dogs"){
         document.getElementById("picture_canvas").style.display = "none";
@@ -176,7 +182,7 @@ function switchModel() {
         document.getElementById("video").style.display = "block";
         document.getElementById("video").play();
         // hide command tray
-        document.getElementById("prechosen_images_parent").style.display = "none";
+        //document.getElementById("prechosen_images_parent").style.display = "none";
     }
      else {
         document.getElementById("picture_canvas").style.display = "none";
@@ -196,15 +202,15 @@ function switchModel() {
     // IF MODEL IS microsoft-coco, change 
 
     // change prechosen_images_parent srcs
-    var prechosen_images = document.getElementById(
-        "prechosen_images"
-    );
+    //var prechosen_images = document.getElementById(
+        //"prechosen_images"
+    //);
 
-    var prechosen_images = prechosen_images.children;
+   // var prechosen_images = prechosen_images.children;
 
-    for (var i = 0; i < prechosen_images.length; i++) {
-        prechosen_images[i].src = available_models[current_model_name]["imageGrid"][i];
-    }
+    // for (var i = 0; i < prechosen_images.length; i++) {
+    //     prechosen_images[i].src = available_models[current_model_name]["imageGrid"][i];
+    // }
 
     // hide webcam button if model is not microsoft-coco
     if (current_model_name == "microsoft-coco" || current_model_name == "variety-of-dogs") {
@@ -333,6 +339,22 @@ function drawBoundingBoxes(predictions, canvas, ctx, scalingRatio, sx, sy, fromD
     );
     }
 }
+function stopWebcam() {
+    webcamLoop = false;
+    var video = document.getElementById("video1");
+    if (video) {
+        var stream = video.srcObject;
+        var tracks = stream.getTracks();
+        tracks.forEach(function (track) {
+            track.stop();
+        });
+        video.srcObject = null;
+        video.remove();
+    }
+    document.getElementById("camera-access-img").style.display = "block";
+    setImageState(CAMERA_ACCESS_URL, "picture_canvas");
+    
+}
 
 function webcamInference() {
     setImageState(
@@ -341,7 +363,7 @@ function webcamInference() {
     );
     webcamLoop = true;
     // hide prechosen_images_parent
-    document.getElementById("prechosen_images_parent").style.display = "none";
+    //document.getElementById("prechosen_images_parent").style.display = "none";
     document.getElementById("picture").style.display = "none";
     // hide picture canvas, show video canvas
     document.getElementById("picture_canvas").style.display = "none";
@@ -353,10 +375,10 @@ function webcamInference() {
     }
 
     if (
-    document.getElementById("video1") &&
-    document.getElementById("video1").style
+        document.getElementById("video1") &&
+        document.getElementById("video1").style
     ) {
-    document.getElementById("video1").style.display = "block";
+        document.getElementById("video1").style.display = "block";
     } else {
     navigator.mediaDevices
         .getUserMedia({ video: true, audio: false })
@@ -400,6 +422,10 @@ function webcamInference() {
                     drawBoundingBoxes(predictions, canvas, ctx, scalingRatio, sx, sy);
             
                     if (!webcamLoop) {
+                        setImageState(LOADING_URL, "video_canvas");
+                        webcamLoop = true;
+                        document.getElementById("dog-count").innerText =  0;
+                        document.getElementById("human-count").innerText = 0;
                         clearInterval(loopID);
                     }
                 });
@@ -573,7 +599,7 @@ function processDrop(e) {
 // click on image-predict, show image inference
 document.getElementById("image-predict").addEventListener("click", function () {
     // show prechosen_images_parent
-    document.getElementById("prechosen_images_parent").style.display = "block";
+    //document.getElementById("prechosen_images_parent").style.display = "block";
     document.getElementById("picture_canvas").style.display = "none";
     document.getElementById("picture").style.display = "block";
     document.getElementById("example_demo").style.display = "none";

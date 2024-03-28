@@ -398,6 +398,8 @@ function webcamInference() {
 
         var canvas = document.getElementById("video_canvas");
         var ctx = canvas.getContext("2d");
+        video.style.transform = "scaleX(-1)";
+
 
         ctx.scale(1, 1);
 
